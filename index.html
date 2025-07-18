@@ -50,12 +50,18 @@
                                 </label>
                                 <label class="radio-option">
                                     <input type="radio" name="questionType" value="text">
-                                    <span>Текстовый ответ с картинкой</span>
+                                    <span>Текстовый ответ</span>
                                 </label>
                             </div>
 
                             <!-- Форма для вопроса с 4 вариантами -->
                             <div id="multiple-choice-form" class="question-form">
+                                <div class="form-group">
+                                    <label class="form-label">Загрузить картинку (необязательно):</label>
+                                    <input type="file" id="mc-question-image" class="form-control" accept="image/*">
+                                    <div id="mc-image-preview"></div>
+                                </div>
+                                
                                 <div class="form-group">
                                     <label class="form-label">Текст вопроса:</label>
                                     <textarea id="mc-question" class="form-control" rows="2" placeholder="Введите текст вопроса"></textarea>
@@ -99,9 +105,9 @@
                             <!-- Форма для текстового вопроса -->
                             <div id="text-answer-form" class="question-form hidden">
                                 <div class="form-group">
-                                    <label class="form-label">Загрузить картинку:</label>
-                                    <input type="file" id="question-image" class="form-control" accept="image/*">
-                                    <div id="image-preview"></div>
+                                    <label class="form-label">Загрузить картинку (необязательно):</label>
+                                    <input type="file" id="text-question-image" class="form-control" accept="image/*">
+                                    <div id="text-image-preview"></div>
                                 </div>
                                 
                                 <div class="form-group">
@@ -206,7 +212,7 @@
                 <div class="question-header">
                     <h2>Вопрос <span id="admin-q-number">1</span> из <span id="admin-q-total">5</span></h2>
                     <div class="timer">
-                        <div id="admin-timer">30</div>
+                        <div id="admin-timer">20</div>
                     </div>
                 </div>
                 
@@ -233,7 +239,7 @@
                 <div class="question-header">
                     <h2>Вопрос <span id="participant-q-number">1</span> из <span id="participant-q-total">5</span></h2>
                     <div class="timer">
-                        <div id="participant-timer">30</div>
+                        <div id="participant-timer">20</div>
                     </div>
                 </div>
                 
