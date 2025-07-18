@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Интерактивная викторина</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- Главное меню -->
+        <div id="main-menu" class="screen active">
+            <div class="container">
+                <h1 class="app-title">Интерактивная викторина</h1>
+                <div class="main-buttons">
+                    <button id="create-quiz-btn" class="btn btn--primary btn--lg">
+                        📝 Создать викторину
+                    </button>
+                    <button id="play-quiz-btn" class="btn btn--secondary btn--lg">
+                        🎮 Играть
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Создание викторины -->
+        <div id="create-quiz" class="screen">
+            <div class="container">
+                <h2>Создание викторины</h2>
+                
+                <div class="quiz-builder">
+                    <div class="quiz-info">
+                        <div class="form-group">
+                            <label class="form-label">Название викторины:</label>
+                            <input type="text" id="quiz-title" class="form-control" placeholder="Введите название викторины">
+                        </div>
+                    </div>
+
+                    <div class="questions-container">
+                        <h3>Вопросы (<span id="questions-count">0</span>)</h3>
+                        <div id="questions-list"></div>
+                        
+                        <div class="add-question-section">
+                            <h4>Добавить новый вопрос</h4>
+                            <div class="question-type-selector">
+                                <label class="radio-option">
+                                    <input type="radio" name="questionType" value="multiple" checked>
+                                    <span>4 варианта ответов</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="questionType" value="text">
+                                    <span>Текстовый ответ с картинкой</span>
+                                </label>
+                            </div>
+
+                            <!-- Форма для вопроса с 4 вариантами -->
+                            <div id="multiple-choice-form" class="question-form">
+                                <div class="form-group">
+                                    <label class="form-label">Текст вопроса:</label>
+                                    <textarea id="mc-question" class="form-control" rows="2" placeholder="Введите текст вопроса"></textarea>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Варианты ответов:</label>
+                                    <div class="options-grid">
+                                        <div class="option-item">
+                                            <input type="text" id="option-0" class="form-control" placeholder="Вариант A">
+                                            <label class="radio-option">
+                                                <input type="radio" name="correctAnswer" value="0">
+                                                <span>Правильный</span>
+                                            </label>
+                                        </div>
+                                        <div class="option-item">
+                                            <input type="text" id="option-1" class="form-control" placeholder="Вариант B">
+                                            <label class="radio-option">
+                                                <input type="radio" name="correctAnswer" value="1">
+                                                <span>Правильный</span>
+                                            </label>
+                                        </div>
+                                        <div class="option-item">
+                                            <input type="text" id="option-2" class="form-control" placeholder="Вариант C">
+                                            <label class="radio-option">
+                                                <input type="radio" name="correctAnswer" value="2">
+                                                <span>Правильный</span>
+                                            </label>
+                                        </div>
+                                        <div class="option-item">
+                                            <input type="text" id="option-3" class="form-control" placeholder="Вариант D">
+                                            <label class="radio-option">
+                                                <input type="radio" name="correctAnswer" value="3">
+                                                <span>Правильный</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Форма для текстового вопроса -->
+                            <div id="text-answer-form" class="question-form hidden">
+                                <div class="form-group">
+                                    <label class="form-label">Загрузить картинку:</label>
+                                    <input type="file" id="question-image" class="form-control" accept="image/*">
+                                    <div id="image-preview"></div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Текст вопроса:</label>
+                                    <textarea id="text-question" class="form-control" rows="2" placeholder="Введите текст вопроса"></textarea>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Правильный ответ:</label>
+                                    <input type="text" id="correct-text-answer" class="form-control" placeholder="Введите правильный ответ">
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button id="add-question-btn" class="btn btn--primary">Добавить вопрос</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="quiz-actions">
+                        <button id="save-quiz-btn" class="btn btn--primary btn--lg">💾 Сохранить викторину</button>
+                        <button id="back-to-menu-btn" class="btn btn--secondary">← Назад</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Экран игры (администратор) -->
+        <div id="game-admin" class="screen">
+            <div class="container">
+                <h2>Управление игрой</h2>
+                
+                <div class="game-setup">
+                    <div class="game-info">
+                        <h3>PIN-код для подключения:</h3>
+                        <div class="pin-display" id="game-pin">----</div>
+                        
+                        <div class="qr-container">
+                            <p>QR-код для быстрого подключения:</p>
+                            <div id="qr-code"></div>
+                        </div>
+                    </div>
+
+                    <div class="participants-section">
+                        <h3>Участники (<span id="participants-count">0</span>)</h3>
+                        <div id="participants-list" class="participants-list"></div>
+                    </div>
+
+                    <div class="game-controls">
+                        <button id="start-game-btn" class="btn btn--primary btn--lg" disabled>
+                            🚀 Начать игру
+                        </button>
+                        <button id="admin-back-btn" class="btn btn--secondary">← Назад</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Экран подключения участника -->
+        <div id="participant-join" class="screen">
+            <div class="container">
+                <h2>Подключение к игре</h2>
+                
+                <div class="join-form">
+                    <div class="form-group">
+                        <label class="form-label">PIN-код игры:</label>
+                        <input type="text" id="join-pin" class="form-control pin-input" placeholder="0000" maxlength="4">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Ваше имя:</label>
+                        <input type="text" id="participant-name" class="form-control" placeholder="Введите ваше имя">
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button id="join-game-btn" class="btn btn--primary btn--lg">Присоединиться</button>
+                        <button id="join-back-btn" class="btn btn--secondary">← Назад</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ожидание начала игры -->
+        <div id="waiting-room" class="screen">
+            <div class="container">
+                <h2>Ожидание начала игры</h2>
+                <div class="waiting-content">
+                    <div class="waiting-info">
+                        <p>✅ Вы успешно подключились!</p>
+                        <p><strong>Имя:</strong> <span id="waiting-name"></span></p>
+                        <p><strong>PIN:</strong> <span id="waiting-pin"></span></p>
+                    </div>
+                    <div class="spinner"></div>
+                    <p>Ожидайте начала игры...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Экран вопроса (администратор) -->
+        <div id="question-admin" class="screen">
+            <div class="container">
+                <div class="question-header">
+                    <h2>Вопрос <span id="admin-q-number">1</span> из <span id="admin-q-total">5</span></h2>
+                    <div class="timer">
+                        <div id="admin-timer">30</div>
+                    </div>
+                </div>
+                
+                <div class="question-content">
+                    <div class="question-image" id="admin-question-image"></div>
+                    <h3 id="admin-question-text"></h3>
+                    <div id="admin-answer-options" class="answer-options"></div>
+                </div>
+                
+                <div class="question-stats">
+                    <h4>Статистика ответов:</h4>
+                    <div id="admin-answer-stats"></div>
+                </div>
+                
+                <div class="admin-controls">
+                    <button id="next-question-btn" class="btn btn--primary" disabled>Следующий вопрос</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Экран вопроса (участник) -->
+        <div id="question-participant" class="screen">
+            <div class="container">
+                <div class="question-header">
+                    <h2>Вопрос <span id="participant-q-number">1</span> из <span id="participant-q-total">5</span></h2>
+                    <div class="timer">
+                        <div id="participant-timer">30</div>
+                    </div>
+                </div>
+                
+                <div class="question-content">
+                    <div class="question-image" id="participant-question-image"></div>
+                    <h3 id="participant-question-text"></h3>
+                    <div id="participant-answer-options" class="participant-answer-options"></div>
+                    <div id="text-answer-input" class="text-answer-input hidden">
+                        <input type="text" id="text-answer" class="form-control" placeholder="Введите ваш ответ">
+                        <button id="submit-text-answer" class="btn btn--primary">Ответить</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Результат ответа -->
+        <div id="answer-result" class="screen">
+            <div class="container">
+                <div class="result-content">
+                    <div class="result-icon" id="result-icon">✅</div>
+                    <h2 id="result-title">Правильно!</h2>
+                    <div id="result-details"></div>
+                    <div class="score-info">
+                        <p><strong>Ваш счет:</strong> <span id="current-score">0</span> очков</p>
+                        <p><strong>За этот вопрос:</strong> +<span id="points-earned">0</span> очков</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Пьедестал -->
+        <div id="podium" class="screen">
+            <div class="container">
+                <h2>🏆 Пьедестал 🏆</h2>
+                <div class="podium-container">
+                    <div class="podium-places">
+                        <div class="podium-place second">
+                            <div class="podium-position">🥈</div>
+                            <div class="podium-name" id="second-place-name">-</div>
+                            <div class="podium-score" id="second-place-score">0</div>
+                        </div>
+                        <div class="podium-place first">
+                            <div class="podium-position">🥇</div>
+                            <div class="podium-name" id="first-place-name">-</div>
+                            <div class="podium-score" id="first-place-score">0</div>
+                        </div>
+                        <div class="podium-place third">
+                            <div class="podium-position">🥉</div>
+                            <div class="podium-name" id="third-place-name">-</div>
+                            <div class="podium-score" id="third-place-score">0</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="podium-controls">
+                    <button id="show-rating-btn" class="btn btn--secondary">📊 Рейтинг</button>
+                    <button id="new-game-btn" class="btn btn--primary">🎮 Новая игра</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Полный рейтинг -->
+        <div id="full-rating" class="screen">
+            <div class="container">
+                <h2>📊 Полный рейтинг</h2>
+                <div id="rating-list" class="rating-list"></div>
+                <div class="rating-controls">
+                    <button id="back-to-podium-btn" class="btn btn--secondary">← К пьедесталу</button>
+                    <button id="rating-new-game-btn" class="btn btn--primary">🎮 Новая игра</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
